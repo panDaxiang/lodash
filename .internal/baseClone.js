@@ -156,20 +156,24 @@ function initCloneArray(array) {
  */
 function baseClone(value, bitmask, customizer, key, object, stack) {
   let result
-  const isDeep = bitmask & CLONE_DEEP_FLAG
-  const isFlat = bitmask & CLONE_FLAT_FLAG
-  const isFull = bitmask & CLONE_SYMBOLS_FLAG
+  const isDeep = bitmask & CLONE_DEEP_FLAG // 101 & 001 -> 001
+  const isFlat = bitmask & CLONE_FLAT_FLAG // 101 & 010 -> 000
+  const isFull = bitmask & CLONE_SYMBOLS_FLAG // 101 & 100 => 100
 
+  // 自定义拷贝
   if (customizer) {
     result = object ? customizer(value, key, object, stack) : customizer(value)
   }
   if (result !== undefined) {
     return result
   }
+  // 非对象直接返回值
   if (!isObject(value)) {
     return value
   }
+  
   const isArr = Array.isArray(value)
+  // 获取数据的类型，[object Array]这种
   const tag = getTag(value)
   if (isArr) {
     result = initCloneArray(value)
@@ -196,6 +200,7 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
       result = initCloneByTag(value, tag, isDeep)
     }
   }
+
   // Check for circular references and return its corresponding clone.
   stack || (stack = new Stack)
   const stacked = stack.get(value)
